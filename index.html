@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6d4aff">
+<title>FLOW</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f7fb;color:#18213f;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:90px}header{background:white;padding:18px;display:flex;justify-content:space-between;border-bottom:1px solid #eee}
+.logo{font-size:24px;font-weight:900;letter-spacing:3px}.tag{font-size:11px;color:#777}.main{padding:16px}.card{background:#fff;border-radius:22px;padding:20px;margin-bottom:14px;box-shadow:0 4px 18px #0000000a}
+h1{font-size:30px;margin:8px 0}h2{font-size:19px}.muted{color:#737991;font-size:14px}.amount{font-size:35px;font-weight:900}.bar{height:12px;background:#e9e9ef;border-radius:20px;overflow:hidden;margin:14px 0}.bar div{height:100%;background:#1b9a68}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#fafafe;padding:14px;border-radius:16px}.stat b{display:block;font-size:20px;margin-top:5px}.green{color:#1b9a68}.red{color:#df5b65}.btn{width:100%;padding:15px;border:0;border-radius:15px;background:#6d4aff;color:#fff;font-weight:800;font-size:15px}.secondary{background:#eeeaff;color:#6d4aff}.field{margin:13px 0}.field label{display:block;font-size:13px;color:#737991;margin-bottom:6px}.field input,.field select{width:100%;padding:14px;border:1px solid #ddd;border-radius:13px;font-size:16px}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.choice{padding:12px;border:0;border-radius:14px;background:#f1f0f6}.choice.sel{background:#eeeaff;color:#6d4aff;outline:2px solid #6d4aff}.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.quick button{border:0;background:white;border-radius:16px;padding:12px 3px}.quick span{font-size:22px}.quick b{font-size:10px;display:block}.nav{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:auto;background:#fff;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(4,1fr);padding:8px}.nav button{border:0;background:none;font-size:11px;color:#18213f}.nav .active{color:#6d4aff;font-weight:900}.modal{display:none;position:fixed;inset:0;background:#18213f66;align-items:end}.modal.open{display:flex}.sheet{background:white;width:100%;max-width:520px;margin:auto 0 0;border-radius:25px 25px 0 0;padding:20px;max-height:90vh;overflow:auto}.row{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:none;font-size:25px}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#18213f;color:white;padding:12px 16px;border-radius:13px;display:none}.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="logo">FLOW</div><div class="tag">Nema pogrešnog skretanja.</div></div><button class="close" onclick="settings()">⚙️</button></header>
+<div id="screen" class="main"></div>
+<nav class="nav"><button class="active" onclick="show('route',this)">🧭<br>Ruta</button><button onclick="entry('expense')">➕<br>Unesi</button><button onclick="show('short',this)">☁️<br>Prečice</button><button onclick="show('history',this)">🏆<br>Moj put</button></nav>
+</div>
+<div id="modal" class="modal"><div class="sheet"><div class="row"><h2 id="mtitle"></h2><button class="close" onclick="closeModal()">×</button></div><div id="mbody"></div></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const K="flow-v01";let d=JSON.parse(localStorage.getItem(K)||"null");if(!d)d={setup:false,start:0,target:0,monthly:0,mode:"sprint",events:[]};
+const save=()=>localStorage.setItem(K,JSON.stringify(d)), money=n=>new Intl.NumberFormat("sr-RS").format(Math.round(n))+" RSD";
+function parseMoney(v){v=String(v??"").replace(/\s/g,"").replace(/\./g,"").replace(/,/g,"");if(v===""||v==="-" )return NaN;return Number(v)}
+function formatMoneyField(el){let raw=String(el.value||"");let neg=raw.trim().startsWith("-");let digits=raw.replace(/[^\d]/g,"");if(!digits){el.value=neg?"-":"";return}el.value=(neg?"-":"")+digits.replace(/\B(?=(\d{3})+(?!\d))/g,".")}
+function toast(t){let x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1800)}
+function bal(){return d.start+d.events.reduce((s,e)=>s+e.delta,0)}
+function setup(){document.getElementById("screen").innerHTML=`<section class="card"><h1>Pronađimo tvoju rutu. 🧭</h1><p class="muted">Nema pogrešnog skretanja. Samo nova finansijska ruta.</p>
+<div class="field"><label>Trenutno stanje (RSD)</label><input id="s" type="text" inputmode="numeric" autocomplete="off" placeholder="-700.000" oninput="formatMoneyField(this)"></div>
+<div class="field"><label>Cilj (RSD)</label><input id="t" type="text" inputmode="numeric" autocomplete="off" placeholder="0" oninput="formatMoneyField(this)"></div>
+<div class="field"><label>Mesečni cilj štednje</label><input id="m" type="text" inputmode="numeric" autocomplete="off" placeholder="200.000" oninput="formatMoneyField(this)"></div>
+<div class="field"><label>Režim</label><div class="choices"><button class="choice" onclick="mode(this,'lagano')">🌿<br>Lagano</button><button class="choice" onclick="mode(this,'srednje')">⚡<br>Srednje</button><button class="choice sel" onclick="mode(this,'sprint')">🚀<br>Sprint</button></div></div>
+<button class="btn" onclick="start()">KREIRAJ MOJU RUTU</button></section>`}
+let chosen="sprint";function mode(el,m){chosen=m;document.querySelectorAll(".choice").forEach(x=>x.classList.remove("sel"));el.classList.add("sel")}
+function start(){let s=parseMoney(document.getElementById("s").value),t=parseMoney(document.getElementById("t").value||0);if(!Number.isFinite(s))return toast("Unesi početno stanje.");d={setup:true,start:s,target:t,monthly:(parseMoney(document.getElementById("m").value||0)||0),mode:chosen,events:[],emergency:null};save();render();toast("Ruta je kreirana!")}
+function render(){
+ if(!d.setup)return setup();
+ let c=bal(),diff=d.target-d.start;
+ let p=diff===0?(c===d.target?100:0):Math.max(0,Math.min(100,((c-d.start)/diff)*100));
+ let emergency=d.emergency&&d.emergency.active;
+ let emergencyHtml=emergency?`<section class="card" style="border:2px solid #f0a03a">
+   <div class="muted">🚨 PRIVREMENA RUTA</div>
+   <h2 style="margin-bottom:6px">Pronašli smo novo skretanje.</h2>
+   <p class="muted">${d.emergency.note}</p>
+   <div class="amount">${money(d.emergency.remaining)}</div>
+   <p class="muted">preostalo za saniranje neplaniranog troška</p>
+   <div class="bar"><div style="width:${Math.max(0,Math.min(100,100-(d.emergency.remaining/d.emergency.amount*100)))}%"></div></div>
+   <p class="muted">Glavni cilj je <b>pauziran</b>. Svaki prihod ili ušteda prvo pomažu ovoj ruti.</p>
+   <button class="btn secondary" onclick="resolveEmergency()">ZAVRŠI NEPLANIRANU RUTU</button>
+ </section>`:"";
+ return document.getElementById("screen").innerHTML=`<section class="card">
+   <div class="muted">🚀 ${d.mode.toUpperCase()} MODE</div>
+   <h1>MOJA RUTA</h1>
+   <div class="muted">Trenutno stanje</div>
+   <div class="amount ${c>=d.target?'green':''}">${money(c)}</div>
+   <div class="muted">cilj: ${money(d.target)}</div>
+   <div class="bar"><div style="width:${p}%"></div></div>
+   <div class="muted">${Math.round(p)}% do cilja ${emergency?" · glavni cilj pauziran":""}</div>
+ </section>
+ ${emergencyHtml}
+ <section class="card"><div class="grid">
+   <div class="stat"><span class="muted">🎯 MESEČNI CILJ</span><b>${money(d.monthly)}</b></div>
+   <div class="stat"><span class="muted">📈 NAPREDAK</span><b class="green">${money(Math.max(0,c-d.start))}</b></div>
+ </div></section>
+ <section class="card"><h2>☁️ PRONAŠLI SMO TI PREČICU</h2><p class="muted">Planiranje obroka i kuvanje kod kuće može smanjiti troškove hrane.</p><button class="btn secondary" onclick="toast('Prečica aktivirana ☁️')">AKTIVIRAJ PREČICU</button></section>
+ <div class="quick">
+   <button onclick="entry('income')"><span>💰</span><b>PRIHOD</b></button>
+   <button onclick="entry('expense')"><span>💸</span><b>TROŠAK</b></button>
+   <button onclick="entry('saving')"><span>🐷</span><b>UŠTEDA</b></button>
+   <button onclick="entry('unplanned')"><span>🚨</span><b>NEPLANIRANO</b></button>
+ </div>`;
+}
+function show(s,el){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));el.classList.add("active");if(s==="route")return render();if(s==="short")document.getElementById("screen").innerHTML=`<section class="card"><h2>☁️ PREČICE</h2><p>🍲 Hrana — planiranje obroka</p><p>⚡ Energija — pametnije korišćenje uređaja</p><p>🛒 Kupovina — praćenje akcija</p><p>💼 Dodatna zarada — povremeni poslovi</p></section>`;if(s==="history")document.getElementById("screen").innerHTML=`<section class="card"><h2>🏆 MOJ PUT</h2><div class="amount green">${money(Math.max(0,bal()-d.start))}</div><p class="muted">napretka</p></section><section class="card">${(d.events.length||d.history?.length)?d.events.slice().reverse().map(e=>`<p><b>${e.label}</b><br><span class="${e.delta>=0?'green':'red'}">${e.delta>=0?"+":""}${money(e.delta)}</span><br><small>${e.date}</small></p>`).join(""):"<p class='muted'>Još nema unosa.</p>"}</section>`}
+function entry(type){let title={income:"💰 Novi prihod",expense:"💸 Novi trošak",saving:"🐷 Ušteda",unplanned:"🚨 Neplanirani trošak"}[type];document.getElementById("mtitle").textContent=title;document.getElementById("mbody").innerHTML=`<div class="field"><label>Iznos (RSD)</label><input id="a" type="text" inputmode="numeric" autocomplete="off" oninput="formatMoneyField(this)"></div><div class="field"><label>Opis</label><input id="desc" placeholder="npr. hrana, plata..."></div><button class="btn" onclick="add('${type}')">SAČUVAJ</button>`;document.getElementById("modal").classList.add("open")}
+function add(type){
+ let a=parseMoney(document.getElementById("a").value);
+ if(!Number.isFinite(a)||a<=0)return toast("Unesi iznos.");
+ let label=document.getElementById("desc").value||"Bez opisa";
+ let delta=type==="income"||type==="saving"?a:-a;
+ d.events.push({delta,label,date:new Date().toLocaleDateString("sr-RS"),type});
+ if(type==="unplanned"){
+   d.emergency={amount:a,remaining:a,note:label||"Neplanirani trošak",startedAt:new Date().toISOString(),active:true};
+ }else if(d.emergency&&d.emergency.active&&(type==="income"||type==="saving")){
+   d.emergency.remaining=Math.max(0,d.emergency.remaining-a);
+   if(d.emergency.remaining===0){
+     d.emergency.active=false;
+     d.history=d.history||[];
+     d.history.push({type:"emergency-complete",amount:d.emergency.amount,note:d.emergency.note,date:new Date().toLocaleDateString("sr-RS")});
+     toast("Neplanirana ruta završena! Vraćamo te na glavni cilj. 🧭");
+   }
+ }
+ save();closeModal();render();
+ if(type!=="unplanned"&&!(d.emergency&&d.emergency.active))toast("Sačuvano!");
+ if(type==="unplanned")toast("Glavni cilj je pauziran. Nova ruta je aktivna. 🚨");
+}
+function resolveEmergency(){
+ if(!d.emergency)return;
+ d.emergency.active=false;
+ d.history=d.history||[];
+ d.history.push({type:"emergency-complete",amount:d.emergency.amount,note:d.emergency.note,date:new Date().toLocaleDateString("sr-RS"),manual:true});
+ save();render();toast("Vraćamo te na glavni cilj. 🧭");
+}
+function settings(){document.getElementById("mtitle").textContent="⚙️ FLOW";document.getElementById("mbody").innerHTML=`<p class="muted">Podaci V0.1 se čuvaju samo u ovom browseru.</p><button class="btn secondary" onclick="if(confirm('Obrisati sve podatke?')){localStorage.removeItem(K);location.reload()}">OBRIŠI PODATKE</button>`;document.getElementById("modal").classList.add("open")}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+render();
+</script>
+</body>
+</html>
