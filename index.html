@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <title>FLOW — Lični Finansijski Navigator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      /* Paleta: lavanda + deep navy + FLOW purple + zelena za napredak + amber za prilike */
+      --bg: #f5f2ff;
+      --bg-alt: #ffffff;
+      --panel-bg: rgba(255,255,255,0.94);
+      --route-bg: #ebe6ff;
+      --navy: #1e2440;
+      --navy-soft: #3b4263;
+      --muted: #8083a0;
+      --primary: #7b4dff;      /* FLOW ljubičasta */
+      --primary-soft: rgba(123, 77, 255, 0.16);
+      --success: #1fb58f;
+      --success-soft: rgba(31,181,143,0.14);
+      --amber: #f6a623;
+      --amber-soft: rgba(246,166,35,0.18);
+      --danger: #e45151;
+      --danger-soft: rgba(228,81,81,0.16);
+      --border: #dfdaf5;
+      --shadow-soft: 0 20px 40px rgba(16, 22, 61, 0.15);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-pill: 999px;
+      --transition-fast: 0.16s ease-out;
+      --transition-med: 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, #fdfbff 0, #f5f2ff 40%, #f0f6ff 100%);
+      color: var(--navy);
+      min-height: 100vh;
+      padding: 14px;
+      display: flex;
+      justify-content: center;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 1080px;
+      background:
+        linear-gradient(145deg, #ffffff 0, #f8f5ff 48%, #f2f7ff 100%);
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: min(90vh, 820px);
+    }
+
+    header {
+      padding: 10px 16px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background:
+        radial-gradient(circle at 0 0, rgba(123, 77, 255, 0.2) 0, transparent 52%),
+        radial-gradient(circle at 100% 0, rgba(31, 181, 143, 0.18) 0, transparent 55%),
+        rgba(19, 25, 58, 0.96);
+      color: #fff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 0, #ffffff 0, #bda7ff 28%, #7b4dff 60%, #1fb58f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      position: relative;
+      box-shadow: 0 12px 26px rgba(7, 9, 32, 0.7);
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .brand-text-main {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(226,232,255,0.9);
+    }
+
+    .brand-text-sub {
+      font-size: 12px;
+      color: rgba(226,232,255,0.8);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lang-toggle, .currency-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: var(--radius-pill);
+      padding: 3px 8px;
+      background: rgba(15,23,42,0.4);
+      border: 1px solid rgba(148, 163, 255, 0.6);
+      font-size: 11px;
+      color: rgba(226,232,255,0.9);
+    }
+
+    .lang-toggle button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: background var(--transition-fast), opacity var(--transition-fast),
+        transform var(--transition-fast);
+    }
+
+    .lang-toggle button.active {
+      background: rgba(148, 163, 255, 0.35);
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    .currency-chip select {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 11px;
+      outline: none;
+    }
+
+    .rhythm-tag {
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: rgba(15,23,42,0.5);
+      border: 1px solid rgba(148, 163, 255, 0.6);
+      font-size: 11px;
+      color: rgba(226,232,255,0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rhythm-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #1fb58f;
+      box-shadow: 0 0 0 3px rgba(31,181,143,0.5);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #onboarding, #main {
+      width: 100%;
+      padding: 16px 16px 18px;
+      overflow-y: auto;
+    }
+
+    /* Journey background lines */
+    #main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(123,77,255,0.08) 0, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(31,181,143,0.08) 0, transparent 55%),
+        linear-gradient(115deg, rgba(123,77,255,0.06) 0, transparent 35%, rgba(31,181,143,0.05) 80%);
+      z-index: -1;
+    }
+
+    /* JOURNEY HEADER CARD (Where am I / Priority / Next) */
+    .journey-strip {
+      display: grid;
+      grid-template-columns: minmax(0,1.2fr) minmax(0,1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 800px) {
+      .journey-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .journey-card {
+      background: var(--panel-bg);
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(223,218,245,0.9);
+      box-shadow: 0 14px 28px rgba(15,23,42,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .journey-card::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 0 0, rgba(123,77,255,0.08) 0, transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(31,181,143,0.08) 0, transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .journey-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .compass-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .compass-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .compass-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(148,163,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at 50% 0, #fff 0, #cdd4ff 55%, #7b4dff 100%);
+    }
+
+    .compass-needle {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      background: linear-gradient(135deg, #e53e3e 0, #f6a623 100%);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      transform: rotate(-20deg);
+    }
+
+    .compass-text-main {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy-soft);
+    }
+
+    .compass-text-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .next-step-pill {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.7);
+      border: 1px dashed rgba(123,77,255,0.5);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .next-step-pill span.flag {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: linear-gradient(135deg, #7b4dff 0, #f6a623 100%);
+    }
+
+    .journey-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 700px) {
+      .journey-metrics {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+    }
+
+    .journey-chip {
+      border-radius: 16px;
+      padding: 7px 9px 6px;
+      background: rgba(247,248,255,0.98);
+      border: 1px solid rgba(223,218,245,0.9);
+      font-size: 11px;
+    }
+
+    .journey-chip-label {
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .journey-chip-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-top: 2px;
+    }
+
+    .journey-chip.badge-success {
+      border-color: rgba(31,181,143,0.5);
+      background: rgba(228, 255, 246, 0.96);
+    }
+
+    .journey-chip.badge-danger {
+      border-color: rgba(228,81,81,0.6);
+      background: rgba(255, 245, 245, 0.98);
+    }
+
+    .priority-card {
+      background: var(--panel-bg);
+      border-radius: var(--radius-lg);
+      padding: 12px 12px 10px;
+      border: 1px solid rgba(223,218,245,0.9);
+      box-shadow: 0 12px 24px rgba(15,23,42,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .priority-card::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        linear-gradient(140deg, rgba(123,77,255,0.12) 0, transparent 45%, rgba(246,166,35,0.08) 80%);
+      pointer-events: none;
+    }
+
+    .priority-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .priority-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .priority-main {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy-soft);
+      margin-bottom: 4px;
+    }
+
+    .priority-next {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .milestone-line {
+      margin-top: 8px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(226,232,255,0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .milestone-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 40%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #7b4dff, #1fb58f);
+    }
+
+    .milestone-flag {
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: #f6a623;
+      box-shadow: 0 0 0 3px rgba(246,166,35,0.35);
+    }
+
+    /* Tabs */
+    .tab-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .tab-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(186,183,240,0.9);
+      padding: 6px 12px;
+      font-size: 12px;
+      background: rgba(243,244,255,0.9);
+      color: var(--navy-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        box-shadow var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #7b4dff 0, #9b6fff 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(44, 40, 102, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .tab-content {
+      margin-top: 4px;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(223,218,245,0.95);
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .panel-header-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .badge-soft {
+      font-size: 10px;
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: var(--primary-soft);
+      color: var(--navy-soft);
+      border: 1px solid rgba(148,163,255,0.8);
+    }
+
+    .badge-soft.green {
+      background: var(--success-soft);
+      color: #116a54;
+      border-color: rgba(31,181,143,0.9);
+    }
+
+    .badge-soft.amber {
+      background: var(--amber-soft);
+      color: #92400e;
+      border-color: rgba(246,166,35,0.9);
+    }
+
+    .badge-soft.danger {
+      background: var(--danger-soft);
+      color: #9b2c2c;
+      border-color: rgba(228,81,81,0.9);
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .metric-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metric-box {
+      border-radius: var(--radius-md);
+      padding: 8px 9px 7px;
+      background: rgba(246,247,255,0.96);
+      border-left: 3px solid rgba(148,163,255,0.9);
+    }
+
+    .metric-title {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .metric-box.success { border-left-color: var(--success); background: rgba(228,255,246,0.96); }
+    .metric-box.danger { border-left-color: var(--danger); background: rgba(255,245,245,0.98); }
+    .metric-box.amber { border-left-color: var(--amber); background: rgba(255,250,235,0.98); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--navy-soft);
+      font-weight: 600;
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 9px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(252,252,255,0.96);
+      font-size: 13px;
+      color: var(--navy);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(123,77,255,0.3);
+      background: #ffffff;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #7b4dff 0, #9b6fff 100%);
+      color: #ffffff;
+      width: 100%;
+      transition: background var(--transition-med), transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(44,40,102,0.5);
+    }
+
+    .btn-small {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    .advisor-box {
+      margin-top: 8px;
+      border-radius: var(--radius-md);
+      border-left-width: 4px;
+      border-left-style: solid;
+      padding: 9px 10px;
+      font-size: 12px;
+    }
+
+    .advisor-box.success { border-left-color: var(--success); background: rgba(228,255,246,0.98); }
+    .advisor-box.warning { border-left-color: var(--amber); background: rgba(255,248,230,0.98); }
+    .advisor-box.danger { border-left-color: var(--danger); background: rgba(255,245,245,0.98); }
+
+    .advisor-box h4 {
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy-soft);
+    }
+
+    .goal-item {
+      border-radius: var(--radius-md);
+      padding: 8px 9px;
+      background: rgba(248,248,255,0.98);
+      border: 1px solid rgba(223,218,245,0.9);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .goal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .goal-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .goal-badge {
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .goal-badge.HITNO { background: var(--danger-soft); color: #9b2c2c; }
+    .goal-badge.VAŽNO { background: var(--amber-soft); color: #92400e; }
+    .goal-badge.NORMALNO { background: var(--success-soft); color: #065f46; }
+
+    .goal-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .goal-tempo {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy-soft);
+    }
+
+    .goal-actions {
+      margin-top: 4px;
+      display: flex;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .action-link {
+      color: #4c6fff;
+      cursor: pointer;
+    }
+    .action-link.danger {
+      color: #c53030;
+    }
+
+    .job-card {
+      border-radius: var(--radius-md);
+      padding: 10px 10px;
+      background: rgba(248,249,255,0.98);
+      border: 1px solid rgba(223,218,245,0.95);
+      margin-bottom: 8px;
+    }
+
+    .job-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: var(--navy-soft);
+    }
+
+    .job-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .job-earn {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--success);
+      margin-bottom: 5px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 2px 6px;
+      font-size: 10px;
+      background: var(--primary-soft);
+      color: var(--navy-soft);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      #app {
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <span>F</span>
+      </div>
+      <div>
+        <div class="brand-text-main">FLOW — tvoj lični CFO</div>
+        <div class="brand-text-sub">
+          Miran finansijski navigator: prvo razume tebe, pa tek onda brojke.
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle" id="langToggle">
+        <button type="button" data-lang="sr" class="active">SR</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <div class="currency-chip">
+        <span style="font-size:10px;">FX</span>
+        <select id="currencySelect">
+          <option value="RSD">RSD</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+      <div class="rhythm-tag" id="rhythmTag">
+        <div class="rhythm-dot"></div>
+        <span id="rhythmText">Ritam: nije podešen</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ONBOARDING CFO SETUP ostaje isti engine, možeš ga dodati po potrebi; fokus je na glavnom ekranu -->
+    <section id="onboarding" class="">
+      <div class="panel" style="margin-bottom:10px;">
+        <div class="panel-header-title">
+          <span>🔧 Postavka domaćinstva (CFO Setup)</span>
+        </div>
+        <div class="panel-sub">
+          Unesi svoje brojeve. FLOW će ih tretirati kao P&amp;L tvog domaćinstva, ali ti ih objasniti jednostavnim jezikom.
+        </div>
+        <div class="form-grid" style="margin-top:10px;">
+          <div class="form-group">
+            <label>Stalna primanja (RSD / EUR / USD)</label>
+            <input id="input-income" type="number" step="0.01" value="250000">
+            <div class="helper-text">Mesečna plata i drugi redovni izvori.</div>
+          </div>
+          <div class="form-group">
+            <label>Dodatna primanja (promenljiva)</label>
+            <input id="input-variable-income" type="number" step="0.01" value="40000">
+            <div class="helper-text">Freelance, povremeni poslovi, bonusi.</div>
+          </div>
+          <div class="form-group">
+            <label>Osnovni mesečni troškovi (OPEX)</label>
+            <input id="input-opex" type="number" step="0.01" value="130000">
+            <div class="helper-text">Hrana, stanovanje, računi, transport – ono bez čega se ne živi.</div>
+          </div>
+          <div class="form-group">
+            <label>Stanje tekućeg računa</label>
+            <input id="input-balance" type="number" step="0.01" value="35000">
+            <div class="helper-text">Može biti pozitivno ili negativno (ako si u dozvoljenom minusu).</div>
+          </div>
+          <div class="form-group">
+            <label>Broj odraslih u domaćinstvu</label>
+            <input id="input-adults" type="number" value="2" min="1">
+          </div>
+          <div class="form-group">
+            <label>Broj dece / tinejdžera</label>
+            <input id="input-kids" type="number" value="1" min="0">
+          </div>
+          <div class="form-group">
+            <label>Početni minus / stari dug za stabilizaciju</label>
+            <input id="input-minus" type="number" step="0.01" value="180000">
+            <div class="helper-text">Ovo tretiramo kao poseban cilj „Stabilizacija“.</div>
+          </div>
+          <div class="form-group">
+            <label>Postojeća zaštitna rezerva (Emergency Fund)</label>
+            <input id="input-shield" type="number" step="0.01" value="45000">
+          </div>
+        </div>
+        <button id="btn-init">Pokreni FLOW analizu rute</button>
+      </div>
+    </section>
+
+    <!-- MAIN VIEW -->
+    <section id="main" class="hidden">
+      <!-- Journey strip: Where am I / Priority / Next step -->
+      <div class="journey-strip">
+        <div class="journey-card">
+          <div class="journey-card-inner">
+            <div class="compass-row">
+              <div class="compass-label">
+                <div class="compass-icon">
+                  <div class="compass-needle"></div>
+                </div>
+                <div>
+                  <div class="compass-text-main">Gde sam sada finansijski?</div>
+                  <div class="compass-text-sub" id="compassSummary">
+                    FLOW mapira tvoju trenutnu poziciju na ruti.
+                  </div>
+                </div>
+              </div>
+              <div class="next-step-pill" id="nextStepPill">
+                <span class="flag"></span>
+                <span id="nextStepText">Sledeći korak: postavljanje ciljeva</span>
+              </div>
+            </div>
+
+            <div class="journey-metrics">
+              <div class="journey-chip">
+                <div class="journey-chip-label">Tekući račun</div>
+                <div class="journey-chip-value" id="chipBalance">0</div>
+              </div>
+              <div class="journey-chip">
+                <div class="journey-chip-label">Osnovni troškovi (OPEX)</div>
+                <div class="journey-chip-value" id="chipOpex">0</div>
+              </div>
+              <div class="journey-chip badge-success">
+                <div class="journey-chip-label">Tok novca (Cash Flow)</div>
+                <div class="journey-chip-value" id="chipFreeCash">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="priority-card">
+          <div class="priority-inner">
+            <div class="priority-title">Trenutni prioritet</div>
+            <div class="priority-main" id="priorityMain">
+              Još nismo izračunali prioritete. Pokreni CFO analizu.
+            </div>
+            <div class="priority-next" id="priorityNext">
+              Kada FLOW vidi tvoju rutu, ovde će ti reći šta je najpametnije da uradiš sledeće.
+            </div>
+            <div class="milestone-line">
+              <div class="milestone-progress" id="milestoneProgress"></div>
+              <div class="milestone-flag"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-menu">
+        <button class="tab-btn active" data-tab="dashboard">🧭 Pregled rute</button>
+        <button class="tab-btn" data-tab="goals">🎯 Ciljevi &amp; održivost</button>
+        <button class="tab-btn" data-tab="analysis">📊 Analiza &amp; istorija</button>
+        <button class="tab-btn" data-tab="emergency">🚨 Neplanirani trošak</button>
+        <button class="tab-btn" data-tab="marketplace">💼 Tržište &amp; alternative</button>
+      </div>
+
+      <!-- TAB: Dashboard -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Mapa rute (bilans &amp; zaštita)</span>
+            <span class="badge-soft green">Finansijsko zdravlje</span>
+          </div>
+          <div class="panel-sub">
+            FLOW gleda tvoje domaćinstvo kao mali biznis, ali ti objašnjava rezultate kao čoveku, ne kao knjigovođi.
+          </div>
+          <div id="health-indicator" class="advisor-box warning" style="margin-top:10px;">
+            <h4>Medicinski pregled finansija</h4>
+            <p class="small-text">
+              Popuni osnovne podatke i pokreni analizu da vidiš koliko je tvoj sistem otporan na šokove.
+            </p>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-box success">
+              <div class="metric-title">Tekući račun (raspoloživo)</div>
+              <div class="metric-value" id="lbl-balance">0</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-title">Zaštitna rezerva (Emergency Fund)</div>
+              <div class="metric-value" id="lbl-shield">0</div>
+            </div>
+          </div>
+          <div class="metric-row" style="margin-top:6px;">
+            <div class="metric-box">
+              <div class="metric-title">Osnovni troškovi (OPEX)</div>
+              <div class="metric-value" id="lbl-opex">0</div>
+            </div>
+            <div class="metric-box amber">
+              <div class="metric-title">Slobodna dobit (Cash Flow)</div>
+              <div class="metric-value" id="lbl-free-cash">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Zaštitna rezerva za tvoje domaćinstvo</span>
+            <span class="badge-soft">Objašnjenje</span>
+          </div>
+          <div class="panel-sub">
+            Ne postoji univerzalni broj „3–6 meseci“ za sve. FLOW računa rezervu na osnovu tvoje porodice.
+          </div>
+          <div class="metric-row" style="margin-top:8px;">
+            <div class="metric-box">
+              <div class="metric-title">Minimalna rezerva (preživljavanje)</div>
+              <div class="metric-value" id="lbl-min-reserve">0</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-title">Komforna rezerva (veća otpornost)</div>
+              <div class="metric-value" id="lbl-comf-reserve">0</div>
+            </div>
+          </div>
+          <div id="reserve-explanation" class="helper-text" style="margin-top:6px;">
+            Učitavanje računice...
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Goals -->
+      <div id="tab-goals" class="tab-content hidden">
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Ciljevi na ruti</span>
+            <span class="badge-soft amber">Prioriteti</span>
+          </div>
+          <div class="panel-sub">
+            Ciljevi su tvoje destinacije. FLOW ih štiti tako što prvo brani ono što je HITNO, pa VAŽNO, a onda pomera NORMALNO kad zatreba.
+          </div>
+          <div id="goals-container" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Provera održivosti novog cilja</span>
+            <span class="badge-soft">Edukativni modul</span>
+          </div>
+          <div class="panel-sub">
+            Unesi potencijalnu obavezu ili cilj. FLOW će ti reći da li je tempo realan za tvoju trenutnu rutu.
+          </div>
+          <div class="form-grid" style="margin-top:8px;">
+            <div class="form-group">
+              <label>Naziv cilja / obaveze</label>
+              <input id="new-goal-name" type="text" placeholder="npr. Poreska obaveza">
+            </div>
+            <div class="form-group">
+              <label>Ukupan iznos</label>
+              <input id="new-goal-amount" type="number" step="0.01" placeholder="500000">
+            </div>
+            <div class="form-group">
+              <label>Rok (u mesecima)</label>
+              <input id="new-goal-months" type="number" placeholder="6" min="1">
+            </div>
+            <div class="form-group">
+              <label>Prioritet cilja</label>
+              <select id="new-goal-priority">
+                <option value="HITNO">🔴 HITNO</option>
+                <option value="VAŽNO">🟠 VAŽNO</option>
+                <option value="NORMALNO" selected>🟢 NORMALNO</option>
+              </select>
+            </div>
+          </div>
+          <button id="btn-check-goal" style="margin-top:8px;">Izračunaj održivost plana</button>
+          <div id="sustainability-result" class="advisor-box hidden" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: Analysis -->
+      <div id="tab-analysis" class="tab-content hidden">
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Mesečna analiza ponašanja</span>
+            <span class="badge-soft green">Uvidi</span>
+          </div>
+          <div class="panel-sub">
+            Kako se tvoj plan i realnost slažu u praksi? FLOW gleda obrasce, ne osuđuje te.
+          </div>
+          <div id="analysis-summary" class="advisor-box success" style="margin-top:8px;">
+            <h4>📊 Demo slika tvog meseca</h4>
+            <p>
+              Prihodi: 320.000 RSD<br>
+              Osnovni troškovi: 180.000 RSD<br>
+              Fleksibilni troškovi: 72.000 RSD<br>
+              Neplanirani troškovi: 38.000 RSD<br>
+              Ušteda: 30.000 RSD
+            </p>
+          </div>
+          <div class="advisor-box warning">
+            <h4>🔍 Skrivena potrošnja</h4>
+            <p>
+              „Kafa nije problem sama po sebi. Ali ako imaš 18 malih troškova mesečno
+              u dostavi i pretplatama koji zajedno čine 14.500 RSD, to je prostor
+              gde možemo da optimizujemo rutu, ne da te kritikujemo.“
+            </p>
+          </div>
+          <div class="advisor-box danger">
+            <h4>⚖️ Realnost vs plan</h4>
+            <p>
+              „Planirani minimalni troškovi su 160.000 RSD, ali poslednja tri meseca
+              stvarno trošiš prosečno 205.000 RSD. Plan od 160.000 RSD nije realan
+              za tvoje domaćinstvo bez ozbiljnog stresa. Zato je pametnije da
+              prilagodimo plan tebi nego da krivimo tebe zbog plana.“
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Emergency -->
+      <div id="tab-emergency" class="tab-content hidden">
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Neplanirani trošak (Emergency Flow)</span>
+            <span class="badge-soft.danger badge-soft danger">Zaštita ciljeva</span>
+          </div>
+          <div class="panel-sub">
+            Kada se desi šok, FLOW najpre koristi tekući račun, zatim zaštitnu rezervu,
+            a tek na kraju pomera rokove ciljeva nižeg prioriteta.
+          </div>
+          <div class="form-grid" style="margin-top:8px;">
+            <div class="form-group">
+              <label>Opis troška</label>
+              <input id="shock-name" type="text" placeholder="npr. Popravka automobila">
+            </div>
+            <div class="form-group">
+              <label>Iznos troška</label>
+              <input id="shock-amount" type="number" step="0.01" placeholder="150000">
+            </div>
+          </div>
+          <button id="btn-emergency" style="margin-top:8px;">Simuliraj finansijski šok</button>
+          <div id="emergency-result" class="advisor-box hidden" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: Marketplace -->
+      <div id="tab-marketplace" class="tab-content hidden">
+        <div class="panel">
+          <div class="panel-header-title">
+            <span>Tržište &amp; alternativni putevi</span>
+            <span class="badge-soft amber">Kasniji korak</span>
+          </div>
+          <div class="panel-sub">
+            Kada plan nije održiv samo rezanjem troškova, sledeći zdrav potez je dodatni
+            prihod. Ovo su samo primeri potencijalnih vikend ruta.
+          </div>
+
+          <div class="job-card">
+            <div class="job-card-title">
+              Eco‑Farma Kosmaj – berba i sakupljanje sena <span class="pill">Premium</span>
+            </div>
+            <div class="job-meta">
+              45 km udaljenost · priroda, zajednica, fizička aktivnost
+            </div>
+            <div class="job-earn">+ 11.000 RSD u tekući račun</div>
+            <button class="btn-small" data-gig="eko">Dodaj ovu zaradu u rutu</button>
+          </div>
+
+          <div class="job-card">
+            <div class="job-card-title">
+              Sezonska logistika i sortiranje robe <span class="pill">Standard</span>
+            </div>
+            <div class="job-meta">
+              6 km (Novi Beograd) · kratki gradski angažman
+            </div>
+            <div class="job-earn">+ 4.500 RSD u tekući račun</div>
+            <button class="btn-small" data-gig="logistika">Dodaj ovu zaradu u rutu</button>
+          </div>
+
+          <div class="advisor-box warning">
+            <h4>🌱 Važna napomena</h4>
+            <p>
+              Ovi poslovi su alati da zakrpiš kratkoročni jaz, ne zamena za
+              dugoročnu strategiju. FLOW ne gura kredit kao prvu opciju — prvo gledamo
+              dodatni prihod i realno prilagođavanje plana.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  // FX demo: baza u "internim" jedinicama (tretiramo kao RSD),
+  // ali formatiramo prema izabranoj valuti
+  const fxRates = {
+    RSD: 1,
+    EUR: 117, // demo kurs
+    USD: 110  // demo kurs
+  };
+
+  const state = {
+    incomeBase: 0,
+    varIncomeBase: 0,
+    opexBase: 0,
+    balanceBase: 0,
+    adults: 2,
+    kids: 1,
+    stabilizationDebtBase: 0,
+    shieldBase: 0,
+    freeCashFlowBase: 0,
+    goals: [],
+    currency: 'RSD',
+    lang: 'sr'
+  };
+
+  function currentSymbol() {
+    if (state.currency === 'RSD') return 'RSD';
+    if (state.currency === 'EUR') return '€';
+    if (state.currency === 'USD') return '$';
+    return '';
+  }
+
+  function convertToBase(displayValue) {
+    const rate = fxRates[state.currency] || 1;
+    return displayValue * (1 / rate);
+  }
+
+  function convertFromBase(baseValue) {
+    const rate = fxRates[state.currency] || 1;
+    return baseValue * rate;
+  }
+
+  function fmtMoneyBase(baseValue) {
+    const v = convertFromBase(baseValue);
+    const locale = 'sr-RS';
+    // RSD bez decimala, ostalo može sa 2
+    const options = state.currency === 'RSD'
+      ? { minimumFractionDigits: 0, maximumFractionDigits: 0 }
+      : { minimumFractionDigits: 0, maximumFractionDigits: 2 };
+    return v.toLocaleString(locale, options) + ' ' + currentSymbol();
+  }
+
+  function genId() {
+    return 'g_' + Math.random().toString(36).slice(2);
+  }
+
+  // INIT CFO
+  function initializeCFO() {
+    const inc = Number(document.getElementById('input-income').value) || 0;
+    const varInc = Number(document.getElementById('input-variable-income').value) || 0;
+    const opex = Number(document.getElementById('input-opex').value) || 0;
+    const bal = Number(document.getElementById('input-balance').value) || 0;
+    const minus = Number(document.getElementById('input-minus').value) || 0;
+    const shield = Number(document.getElementById('input-shield').value) || 0;
+    const adults = Number(document.getElementById('input-adults').value) || 1;
+    const kids = Number(document.getElementById('input-kids').value) || 0;
+
+    // u baznu valutu
+    state.incomeBase = convertToBase(inc);
+    state.varIncomeBase = convertToBase(varInc);
+    state.opexBase = convertToBase(opex);
+    state.balanceBase = convertToBase(bal);
+    state.stabilizationDebtBase = convertToBase(minus);
+    state.shieldBase = convertToBase(shield);
+    state.adults = adults;
+    state.kids = kids;
+
+    state.freeCashFlowBase = (state.incomeBase + state.varIncomeBase) - state.opexBase;
+
+    state.goals = [];
+    if (state.stabilizationDebtBase > 0) {
+      state.goals.push({
+        id: genId(),
+        name: "Stabilizacija – izlazak iz minusa",
+        targetBase: state.stabilizationDebtBase,
+        currentBase: 0,
+        months: 6,
+        priority: "HITNO"
+      });
+    }
+    state.goals.push({
+      id: genId(),
+      name: "Porodično putovanje / rezerva",
+      targetBase: convertToBase(200000),
+      currentBase: convertToBase(40000),
+      months: 5,
+      priority: "NORMALNO"
+    });
+
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('main').classList.remove('hidden');
+
+    recalcAllAndRender();
+  }
+
+  function recalcAllAndRender() {
+    renderDashboard();
+    renderReserve();
+    evaluateFinancialHealth();
+    renderGoals();
+    updateCompassAndPriority();
+  }
+
+  function renderDashboard() {
+    document.getElementById('lbl-balance').textContent = fmtMoneyBase(state.balanceBase);
+    document.getElementById('lbl-shield').textContent = fmtMoneyBase(state.shieldBase);
+    document.getElementById('lbl-opex').textContent = fmtMoneyBase(state.opexBase);
+    document.getElementById('lbl-free-cash').textContent = fmtMoneyBase(state.freeCashFlowBase);
+
+    document.getElementById('chipBalance').textContent = fmtMoneyBase(state.balanceBase);
+    document.getElementById('chipOpex').textContent = fmtMoneyBase(state.opexBase);
+    document.getElementById('chipFreeCash').textContent = fmtMoneyBase(state.freeCashFlowBase);
+  }
+
+  function renderReserve() {
+    const factorMin = 3 + state.kids * 0.5;
+    const factorComf = 6 + state.kids * 1.0;
+    const minBase = state.opexBase * factorMin;
+    const comfBase = state.opexBase * factorComf;
+
+    document.getElementById('lbl-min-reserve').textContent = fmtMoneyBase(minBase);
+    document.getElementById('lbl-comf-reserve').textContent = fmtMoneyBase(comfBase);
+
+    const exp = document.getElementById('reserve-explanation');
+    exp.innerHTML = `
+      Tvoje domaćinstvo ima <strong>${state.adults}</strong> odrasle osobe i
+      <strong>${state.kids}</strong> dece, sa osnovnim mesečnim troškovima (OPEX)
+      od oko <strong>${fmtMoneyBase(state.opexBase)}</strong>.<br>
+      Minimalna rezerva pokriva približno <strong>${factorMin.toFixed(1)} meseci</strong>
+      preživljavanja, dok komforna rezerva pokriva oko
+      <strong>${factorComf.toFixed(1)} meseci</strong> života bez panike kada se desi šok.
+    `;
+  }
+
+  function evaluateFinancialHealth() {
+    const box = document.getElementById('health-indicator');
+    const reserveMonths = state.opexBase > 0 ? state.shieldBase / state.opexBase : 0;
+
+    if (state.stabilizationDebtBase > convertToBase(200000) || reserveMonths < 1) {
+      box.className = "advisor-box danger";
+      box.innerHTML = `
+        <h4>🔴 Visok prioritet stabilizacije</h4>
+        <p>
+          Zaštitna rezerva je jako niska u odnosu na tvoje osnovne troškove,
+          a postojeći minus pravi dodatni pritisak.<br><br>
+          Najpametniji sledeći potez: fokus na <strong>Stabilizaciju</strong>
+          i izgradnju minimalne rezerve. FLOW će ti pomoći da novi ciljevi želja
+          sačekaju dok se ne ojača temelj.
+        </p>
+      `;
+      document.getElementById('priorityMain').textContent = "Stabilizacija i jačanje zaštitne rezerve";
+      document.getElementById('priorityNext').textContent =
+        "Pre nego što dodaš nove ciljeve (putovanja, renoviranja), ima smisla da zatvoriš minus i napraviš bar minimalnu zaštitnu rezervu.";
+    } else if (reserveMonths >= 1 && reserveMonths < 3) {
+      box.className = "advisor-box warning";
+      box.innerHTML = `
+        <h4>🟠 Potrebno poboljšanje otpornosti</h4>
+        <p>
+          Sistem je funkcionalan, ali nema dovoljno jastuka za veće šokove.
+          Jedan neplanirani trošak može lako da pomeri rokove tvojih ciljeva.<br><br>
+          Sledeći pametan potez: deo slobodne dobiti usmeriti u jačanje
+          <strong>Zaštitne rezerve</strong>, a ostatak ravnomerno ka ciljevima.
+        </p>
+      `;
+      document.getElementById('priorityMain').textContent = "Balans između ciljeva i rezerve";
+      document.getElementById('priorityNext').textContent =
+        "FLOW bi predložio da svaki mesec deo slobodnog novca ide u zaštitnu rezervu, a deo u cilj koji ti je emocionalno najvažniji.";
+    } else {
+      box.className = "advisor-box success";
+      box.innerHTML = `
+        <h4>🟢 Dobra finansijska otpornost</h4>
+        <p>
+          Imaš pristojnu zaštitnu rezervu u odnosu na osnovne troškove, a sistem
+          nije preopterećen dugom.<br><br>
+          Sledeći pametan potez: jasnije definisanje ciljeva (HITNO, VAŽNO,
+          NORMALNO) i dogovor sa sobom koliko mesecima želiš da traje svaki od njih.
+        </p>
+      `;
+      document.getElementById('priorityMain').textContent = "Optimizacija ciljeva i rokova";
+      document.getElementById('priorityNext').textContent =
+        "Sada je pravi trenutak da fino podesiš prioritete: koje ciljeve želiš da ubrzaš, a koje možeš da pomeriš bez griže savesti.";
+    }
+  }
+
+  function renderGoals() {
+    const container = document.getElementById('goals-container');
+    container.innerHTML = "";
+    if (!state.goals.length) {
+      container.innerHTML = `<div class="helper-text">Još nema definisanih ciljeva. Prvi cilj često bude „Stabilizacija“ ili mali sigurnosni fond.</div>`;
+      return;
+    }
+
+    state.goals.forEach(g => {
+      const neededBase = Math.max(g.targetBase - g.currentBase, 0);
+      const months = Math.max(g.months, 1);
+      const tempoBase = neededBase / months;
+
+      const div = document.createElement('div');
+      div.className = 'goal-item';
+
+      div.innerHTML = `
+        <div class="goal-header">
+          <div class="goal-name">${g.name}</div>
+          <div class="goal-badge ${g.priority}">${g.priority}</div>
+        </div>
+        <div class="goal-meta">
+          Ciljni iznos: <strong>${fmtMoneyBase(g.targetBase)}</strong> ·
+          Već izdvojeno: <strong>${fmtMoneyBase(g.currentBase)}</strong><br>
+          Preostalo: <strong>${fmtMoneyBase(neededBase)}</strong> ·
+          Rok: <strong>${months} meseci</strong>
+        </div>
+        <div class="goal-tempo">
+          Preporučen tempo izdvajanja: <span style="color:#ea580c;">${fmtMoneyBase(tempoBase)} / mesec</span>
+        </div>
+        <div class="goal-actions">
+          <span class="action-link" data-edit="${g.id}">✏️ Ispravi</span>
+          <span class="action-link danger" data-delete="${g.id}">🗑️ Obriši</span>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function onGoalsClick(e) {
+    const editId = e.target.getAttribute('data-edit');
+    const delId = e.target.getAttribute('data-delete');
+    if (editId) editGoal(editId);
+    if (delId) deleteGoal(delId);
+  }
+
+  function editGoal(id) {
+    const g = state.goals.find(x => x.id === id);
+    if (!g) return;
+    const name = prompt("Novi naziv cilja:", g.name) || g.name;
+    const target = Number(prompt("Novi ciljni iznos (u izabranoj valuti):", convertFromBase(g.targetBase))) || convertFromBase(g.targetBase);
+    const current = Number(prompt("Već izdvojeno (u izabranoj valuti):", convertFromBase(g.currentBase))) || convertFromBase(g.currentBase);
+    const months = Number(prompt("Rok u mesecima:", g.months)) || g.months;
+    const priority = prompt("Prioritet (HITNO / VAŽNO / NORMALNO):", g.priority) || g.priority;
+
+    g.name = name;
+    g.targetBase = convertToBase(target);
+    g.currentBase = convertToBase(current);
+    g.months = months;
+    g.priority = ["HITNO","VAŽNO","NORMALNO"].includes(priority) ? priority : g.priority;
+
+    renderGoals();
+  }
+
+  function deleteGoal(id) {
+    if (!confirm("Sigurno želiš da obrišeš ovaj cilj?")) return;
+    state.goals = state.goals.filter(g => g.id !== id);
+    renderGoals();
+  }
+
+  function analyzeGoalSustainability() {
+    const name = (document.getElementById('new-goal-name').value || "Novi cilj").trim();
+    const amountRaw = Number(document.getElementById('new-goal-amount').value) || 0;
+    const months = Math.max(Number(document.getElementById('new-goal-months').value) || 1, 1);
+    const priority = document.getElementById('new-goal-priority').value;
+    const box = document.getElementById('sustainability-result');
+    box.classList.remove('hidden');
+
+    if (amountRaw <= 0) {
+      box.className = "advisor-box warning";
+      box.innerHTML = `
+        <h4>📌 Potreban je iznos cilja</h4>
+        <p>Unesi iznos koji želiš da obezbediš da bismo mogli da testiramo plan.</p>
+      `;
+      return;
+    }
+
+    const amountBase = convertToBase(amountRaw);
+    const neededMonthlyBase = amountBase / months;
+    const freeBase = state.freeCashFlowBase;
+
+    if (neededMonthlyBase > freeBase) {
+      const gapBase = neededMonthlyBase - freeBase;
+      const recommendedMonths = freeBase > 0 ? (amountBase / freeBase) : months * 2;
+
+      box.className = "advisor-box danger";
+      box.innerHTML = `
+        <h4>🔴 Plan nije održiv u zadatom roku</h4>
+        <p>
+          Za cilj <strong>„${name}“</strong> u roku od
+          <strong>${months} meseci</strong> potrebno je
+          približno <strong>${fmtMoneyBase(neededMonthlyBase)} mesečno</strong>.<br>
+          Tvoja trenutna slobodna dobit je oko
+          <strong>${fmtMoneyBase(freeBase)}</strong> mesečno.
+          Razlika (finansijski jaz) je oko
+          <strong>${fmtMoneyBase(gapBase)}</strong> mesečno.
+        </p>
+        <p>
+          Ovo ne znači da je cilj loš – samo da je u ovom roku previše ambiciozan
+          za tvoju trenutnu rutu.
+        </p>
+        <ul class="small-text">
+          <li><strong>Opcija A – dodatni prihod:</strong> ciljati oko ${fmtMoneyBase(gapBase)} ekstra mesečno.</li>
+          <li><strong>Opcija B – pomeranje roka:</strong> pomeriti rok na oko <strong>${Math.ceil(recommendedMonths)} meseci</strong> da bi tempo bio realan.</li>
+          <li><strong>Opcija C – smanjenje fleksibilne potrošnje:</strong> deo jaza pokriti kroz optimizaciju „skrivene potrošnje“.</li>
+        </ul>
+        <p class="small-text">
+          Kredit ili pozajmica nisu automatski rešenje – oni stvaraju novu
+          mesečnu obavezu. FLOW ih vidi kao poslednju opciju, ne prvu.
+        </p>
+      `;
+    } else {
+      box.className = "advisor-box success";
+      box.innerHTML = `
+        <h4>🟢 Plan je održiv</h4>
+        <p>
+          Tempo od oko <strong>${fmtMoneyBase(neededMonthlyBase)} mesečno</strong>
+          uklapa se u tvoju trenutnu slobodnu dobit
+          (<strong>${fmtMoneyBase(freeBase)}</strong>).<br>
+          Ovaj cilj je realan bez narušavanja osnovne stabilnosti.
+        </p>
+        <p class="small-text">
+          Ako želiš, možeš ga dodati u listu ciljeva i kasnije ga fino podešavati
+          zajedno sa ostalim obavezama.
+        </p>
+      `;
+    }
+  }
+
+  function executeEmergencyFlow() {
+    const name = (document.getElementById('shock-name').value || "Neplanirani trošak").trim();
+    const amountRaw = Number(document.getElementById('shock-amount').value) || 0;
+    const box = document.getElementById('emergency-result');
+    box.classList.remove('hidden');
+
+    if (amountRaw <= 0) {
+      box.className = "advisor-box warning";
+      box.innerHTML = `
+        <h4>📌 Unesi iznos šoka</h4>
+        <p>Bez realnog iznosa troška ne možemo da simuliramo posledice.</p>
+      `;
+      return;
+    }
+
+    const amountBase = convertToBase(amountRaw);
+    let report = `<h4>⚡ Emergency Flow – ${name}</h4>`;
+
+    if (state.balanceBase >= amountBase) {
+      state.balanceBase -= amountBase;
+      box.className = "advisor-box success";
+      report += `
+        <p>
+          🟢 Tekući račun je uspeo da apsorbuje trošak od
+          <strong>${fmtMoneyBase(amountBase)}</strong> bez diranja zaštitne rezerve
+          i ciljeva.<br><br>
+          Ovo je znak da tvoj sistem ima zdravu likvidnost za ovakav nivo šoka.
+        </p>
+      `;
+    } else if (state.balanceBase + state.shieldBase >= amountBase) {
+      const remainingBase = amountBase - state.balanceBase;
+      state.balanceBase = 0;
+      state.shieldBase -= remainingBase;
+      box.className = "advisor-box warning";
+      report += `
+        <p>
+          🛡️ Deo troška je pokriven iz tekućeg računa, a ostatak
+          (<strong>${fmtMoneyBase(remainingBase)}</strong>) iz Zaštitne rezerve.<br><br>
+          Ciljevi i rokovi ostaju nepromenjeni, ali zaštitna mreža je sada tanja.
+          Sledećih par meseci ima smisla dopuniti rezervu pre otvaranja novih ciljeva.
+        </p>
+      `;
+    } else {
+      box.className = "advisor-box danger";
+      const totalLiquidityBase = state.balanceBase + state.shieldBase;
+      let remainingShockBase = amountBase - totalLiquidityBase;
+      state.balanceBase = 0;
+      state.shieldBase = 0;
+
+      report += `
+        <p>
+          🔴 Sva dostupna likvidnost (tekući račun + zaštitna rezerva) u iznosu
+          od <strong>${fmtMoneyBase(totalLiquidityBase)}</strong> je potrošena,
+          ali i dalje ostaje nepokriven deo šoka
+          od <strong>${fmtMoneyBase(remainingShockBase)}</strong>.
+        </p>
+      `;
+
+      const priorities = ["NORMALNO", "VAŽNO", "HITNO"];
+      let lowPriorityGoal = null;
+      for (const p of priorities) {
+        lowPriorityGoal = state.goals.find(g => g.priority === p);
+        if (lowPriorityGoal) break;
+      }
+
+      if (lowPriorityGoal) {
+        const oldMonths = lowPriorityGoal.months;
+        const tempoBase = Math.max(state.freeCashFlowBase, convertToBase(1));
+        const addedMonths = Math.ceil(remainingShockBase / tempoBase);
+        lowPriorityGoal.months += addedMonths;
+
+        report += `
+          <p>
+            FLOW je odlučio da zaštiti ciljeve višeg prioriteta i zato pomera rok
+            cilja nižeg prioriteta:
+          </p>
+          <ul class="small-text">
+            <li>Cilj: <em>${lowPriorityGoal.name}</em></li>
+            <li>Originalni rok: ${oldMonths} meseci</li>
+            <li>Novi procenjeni rok: ${lowPriorityGoal.months} meseci</li>
+          </ul>
+          <p class="small-text">
+            Šok je praktično pomerio ovaj cilj za oko ${addedMonths} meseci.
+            Nije kazna, već iskrena slika: deo slobodne dobiti sada ide na
+            zatvaranje posledica šoka.
+          </p>
+        `;
+      } else {
+        report += `
+          <p class="small-text">
+            Ne postoji cilj nižeg prioriteta koji možemo pomeriti. To znači da je
+            plan trenutno prenapregnut. Najpametniji sledeći potez je da
+            razmisliš o dodatnom prihodu (gigovi, projekti) ili privremenoj
+            redefiniciji ciljeva.
+          </p>
+        `;
+      }
+    }
+
+    renderDashboard();
+    renderReserve();
+    evaluateFinancialHealth();
+    renderGoals();
+    box.innerHTML = report;
+  }
+
+  function injectGigEarnings(amountRaw, label) {
+    const amountBase = convertToBase(amountRaw);
+    state.balanceBase += amountBase;
+    renderDashboard();
+    evaluateFinancialHealth();
+    alert(`Uspešno si dodala ${amountRaw.toLocaleString('sr-RS')} ${currentSymbol()} iz rute „${label}“ u tekući račun.\n\nFLOW beleži da si problem rešila zaradom, ne pozajmicom.`);
+  }
+
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.remove('hidden');
+    if (btn) btn.classList.add('active');
+  }
+
+  function updateCompassAndPriority() {
+    const summary = document.getElementById('compassSummary');
+    const nextStep = document.getElementById('nextStepText');
+    const progress = document.getElementById('milestoneProgress');
+
+    const free = state.freeCashFlowBase;
+    const opex = state.opexBase;
+
+    if (opex <= 0 && free === 0) {
+      summary.textContent = "FLOW još nema dovoljno podataka. Unesi barem prihode i osnovne troškove.";
+      nextStep.textContent = "Sledeći korak: popuni osnovne podatke i pokreni analizu.";
+      progress.style.width = "10%";
+      return;
+    }
+
+    const ratio = opex > 0 ? (free / opex) : 0;
+    if (ratio < 0) {
+      summary.textContent = "Trenutno trošiš više nego što zarađuješ. Nije tragedija, ali plan zahteva korekciju.";
+      nextStep.textContent = "Sledeći korak: pogledaj gde curi novac i postavi cilj Stabilizacije.";
+      progress.style.width = "20%";
+    } else if (ratio < 0.3) {
+      summary.textContent = "U blagom si plusu. Sistem diše, ali nema još jastuka.";
+      nextStep.textContent = "Sledeći korak: definiši jedan HITAN cilj i jednu skromnu rezervu.";
+      progress.style.width = "40%";
+    } else if (ratio < 0.7) {
+      summary.textContent = "Tvoj mesečni tok novca ima solidnu maržu iznad osnovnih troškova.";
+      nextStep.textContent = "Sledeći korak: uskladi ciljeve sa realnim tempom izdvajanja.";
+      progress.style.width = "65%";
+    } else {
+      summary.textContent = "Nalaziš se u zoni snažnog pozitivnog toka novca. Ovo je odlična pozicija za ubrzanje važnih ciljeva.";
+      nextStep.textContent = "Sledeći korak: odluči da li želiš da ubrzaš neki VAŽAN cilj ili da podigneš nivo sigurnosne rezerve.";
+      progress.style.width = "85%";
+    }
+  }
+
+  // Language and currency toggles (minimal; tekst je već primarno na srpskom)
+  function bindLangAndCurrency() {
+    document.getElementById('currencySelect').addEventListener('change', e => {
+      state.currency = e.target.value;
+      recalcAllAndRender();
+    });
+
+    document.getElementById('langToggle').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-lang]');
+      if (!btn) return;
+      const lang = btn.getAttribute('data-lang');
+      state.lang = lang;
+      document.querySelectorAll('#langToggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Za sada UI je primarno na srpskom; eng verziju možeš kasnije proširiti.
+      alert(lang === 'sr'
+        ? "Interfejs je već optimizovan za srpski jezik. Kasnije možemo dodati punu EN verziju teksta."
+        : "Full English copy will be added in a later iteration. For now core logic works the same.");
+    });
+  }
+
+  function bindEvents() {
+    document.getElementById('btn-init').addEventListener('click', initializeCFO);
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        switchTab(tab, btn);
+      });
+    });
+
+    document.getElementById('goals-container').addEventListener('click', onGoalsClick);
+
+    document.getElementById('btn-check-goal').addEventListener('click', analyzeGoalSustainability);
+    document.getElementById('btn-emergency').addEventListener('click', executeEmergencyFlow);
+
+    document.querySelectorAll('[data-gig]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const gig = btn.getAttribute('data-gig');
+        if (gig === 'eko') {
+          injectGigEarnings(11000, "Eco‑Farma Kosmaj");
+        } else if (gig === 'logistika') {
+          injectGigEarnings(4500, "Sezonska logistika");
+        }
+      });
+    });
+
+    bindLangAndCurrency();
+  }
+
+  bindEvents();
+})();
+</script>
+</body>
+</html>
